@@ -1,10 +1,9 @@
-package moveBot1;
+package afkAttackBot;
 
-import battlecode.common.*;
-
-import java.util.Arrays;
-
-import static moveBot1.RobotPlayer.directions;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 public class PathFind {
 
@@ -12,8 +11,6 @@ public class PathFind {
   private static MapLocation closestObstacle = null;
   private static int closestObstacleDist = Integer.MAX_VALUE;
   private static Direction bugDir = null;
-
-  private static MapLocation enemyFlagLocation = null;
 
   public static void resetBug() {
     int bugState = 0; //0 head to target, 1 circling
@@ -70,51 +67,4 @@ public class PathFind {
 //      i++;
 //    } while (i < 8);
   }
-
-  public static void moveAwayFromTarget(RobotController rc, MapLocation target) throws GameActionException {
-    if (!rc.isMovementReady()) {
-      return;
-    }
-    Direction oppositeDirection = rc.getLocation().directionTo(target).opposite();
-    if (rc.canMove(oppositeDirection)) {
-      rc.move(oppositeDirection);
-      return;
-    }
-    //if cannot move in exact opposite, will go away in an angle
-    if (rc.canMove(oppositeDirection.rotateLeft())) {
-      rc.move(oppositeDirection.rotateLeft());
-      return;
-    }
-    if (rc.canMove(oppositeDirection.rotateRight())) {
-      rc.move(oppositeDirection.rotateRight());
-      return;
-    }
-  }
-
-  //Not very helpful as doesn't really go anywhere
-  public static void exploreRandomly(RobotController rc) throws GameActionException {
-    if (!rc.isMovementReady()) {
-      return;
-    }
-    Direction dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-//    MapLocation nextLoc = rc.getLocation().add(dir);
-    if (rc.canMove(dir)) {
-      rc.move(dir);
-    }
-  }
-
-//  public static void goToEnemyFlag(RobotController rc) throws GameActionException {
-//    if(enemyFlagLocation == null) {
-//      enemyFlagLocation = rc.senseBroadcastFlagLocations()
-//    }
-//    if (!rc.isMovementReady()) {
-//      return;
-//    }
-//    Direction dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-////    MapLocation nextLoc = rc.getLocation().add(dir);
-//    if (rc.canMove(dir)) {
-//      rc.move(dir);
-//    }
-//  }
-
 }

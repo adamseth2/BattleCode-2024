@@ -1,10 +1,8 @@
-package moveBot1;
+package afkAttackBot;
 
-import moveBot1.Skirmish;
 import battlecode.common.*;
+import afkAttackBot.Skirmish;
 
-import java.awt.*;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -52,12 +50,9 @@ public strictfp class RobotPlayer {
    **/
   @SuppressWarnings("unused")
   public static void run(RobotController rc) throws GameActionException {
-    boolean reachedDest = false;
-    MapLocation dest = new MapLocation(24, 11);
 
     // Hello world! Standard output is very useful for debugging.
     // Everything you say here will be directly viewable in your terminal when you run a match!
-
     // You can also use indicators to save debug notes in replays.
 
     while (true) {
@@ -83,13 +78,9 @@ public strictfp class RobotPlayer {
 //                    if(crumbArr.length != 0) {
 //                      nearestCrumb = crumbArr[0];
 //                    }
-          rc.setIndicatorString(Boolean.toString(reachedDest));
-          if (!reachedDest && !rc.getLocation().equals(dest)) {
-            PathFind.bugNavOne(rc, dest);
-            continue;
-          }
-          reachedDest = true;
           Skirmish.basicOffense(rc);
+//          MapLocation dest = new MapLocation(4, 8);
+//          PathFind.bugNavOne(rc, dest);
 //                  if (rc.canMove(Direction.WEST)) {
 //                    rc.move(Direction.WEST);
 //                  } else {
