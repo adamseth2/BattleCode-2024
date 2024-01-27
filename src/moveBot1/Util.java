@@ -8,4 +8,8 @@ public class Util {
   public static boolean isInAttackRange(MapLocation loc1, MapLocation loc2) throws GameActionException {
     return loc1.isWithinDistanceSquared(loc2, GameConstants.ATTACK_RADIUS_SQUARED);
   }
+
+  public static boolean isSamePlane(MapLocation loc1, MapLocation loc2) throws GameActionException {
+    return loc1.x == loc2.x || loc1.y == loc2.y;
+  }
 }

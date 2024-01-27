@@ -14,16 +14,23 @@ public class PathFind {
   private static MapLocation enemyFlagLocation = null;
 
   public static void resetBug() {
-    int bugState = 0; //0 head to target, 1 circling
-    MapLocation closestObstacle = null;
-    int closestObstacleDist = Integer.MAX_VALUE;
-    Direction bugDir = null;
+    bugState = 0; //0 head to target, 1 circling
+    closestObstacle = null;
+    closestObstacleDist = Integer.MAX_VALUE;
+    bugDir = null;
   }
 
   public static void bugNavOne(RobotController rc, MapLocation dest) throws GameActionException {
-    rc.setIndicatorString("BugState: " + bugState + " closestObstacle: " + closestObstacle + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)));
+//    if (closestObstacle != null) {
+//      System.out.println(rc.getLocation().toString());
+//      System.out.println(dest.toString());
+////      System.out.println(closestObstacle.toString());
+//
+//    }
+    rc.setIndicatorString("BugState: " + bugState + " closestObstacle: " + closestObstacle + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
     if (!rc.isMovementReady() || rc.getLocation().equals(dest)) {
       rc.setIndicatorString("I am at Destination or I cannot Move");
+      resetBug();
       return;
     }
 //    if(rc.sensePassability(dest)) {
@@ -31,6 +38,7 @@ public class PathFind {
 //    }
     if (bugState == 0) {
       bugDir = rc.getLocation().directionTo(dest);
+      System.out.println("bugDir: " + bugDir.toString());
       if (rc.canMove(bugDir)) {
         rc.move(bugDir);
         return;
@@ -98,19 +106,44 @@ public class PathFind {
       return;
     }
     Direction oppositeDirection = rc.getLocation().directionTo(target).opposite();
-    if (rc.canMove(oppositeDirection)) {
-      rc.move(oppositeDirection);
-      return;
+    Direction[] priorityMovementOrder;
+    Direction rotatedLeft = oppositeDirection.rotateLeft();
+    Direction rotatedLeftLeft = rotatedLeft.rotateLeft();
+    Direction rotatedRight = oppositeDirection.rotateRight();
+    Direction rotatedRightRight = rotatedRight.rotateRight();
+    if (Util.isSamePlane(rc.getLocation(), target)) {
+      priorityMovementOrder = new Direction[]{rotatedLeft, rotatedRight, oppositeDirection, rotatedLeftLeft, rotatedRightRight};
+    } else {
+      priorityMovementOrder = new Direction[]{oppositeDirection, rotatedLeft, rotatedRight, rotatedLeftLeft, rotatedRightRight};
     }
-    //if cannot move in exact opposite, will go away in an angle
-    if (rc.canMove(oppositeDirection.rotateLeft())) {
-      rc.move(oppositeDirection.rotateLeft());
-      return;
+    for (Direction currDir : priorityMovementOrder) {
+      if (rc.canMove(currDir)) {
+        rc.move(currDir);
+        return;
+      }
     }
-    if (rc.canMove(oppositeDirection.rotateRight())) {
-      rc.move(oppositeDirection.rotateRight());
-      return;
-    }
+//    if (rc.canMove(oppositeDirection)) {
+//      rc.move(oppositeDirection);
+//      return;
+//    }
+//    //if cannot move in exact opposite, will go away in an angle
+//    if (rc.canMove(oppositeDirection.rotateLeft())) {
+//      rc.move(oppositeDirection.rotateLeft());
+//      return;
+//    }
+//    if (rc.canMove(oppositeDirection.rotateRight())) {
+//      rc.move(oppositeDirection.rotateRight());
+//      return;
+//    }
+//    //moves perpendicular to target
+//    if (rc.canMove(oppositeDirection.rotateLeft().rotateLeft())) {
+//      rc.move(oppositeDirection.rotateRight().rotateLeft());
+//      return;
+//    }
+//    if (rc.canMove(oppositeDirection.rotateRight().rotateRight())) {
+//      rc.move(oppositeDirection.rotateRight().rotateRight());
+//      return;
+//    }
   }
 
   //Not very helpful as doesn't really go anywhere

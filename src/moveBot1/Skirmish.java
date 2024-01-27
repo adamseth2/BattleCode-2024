@@ -36,6 +36,7 @@ public class Skirmish {
 //    System.out.println(Integer.toString(rc.getActionCooldownTurns()));
     rc.setIndicatorString(Integer.toString(rc.getActionCooldownTurns()));
     if (nearbyEnemies.length == 0) {
+      rc.setIndicatorString("Exploring Randomly");
       PathFind.exploreRandomly(rc);
       return;
     }
@@ -56,7 +57,7 @@ public class Skirmish {
     }
     //move close and try to attack
     PathFind.bugNavOne(rc, enemyLocation);
-    System.out.println("I moved and I can attack: " + Integer.toString(rc.getActionCooldownTurns()));
+//    System.out.println("I moved and I can attack: " + Integer.toString(rc.getActionCooldownTurns()));
     if (rc.canAttack(enemyLocation)) {
       rc.attack(enemyLocation);
       return;

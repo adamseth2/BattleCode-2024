@@ -53,7 +53,7 @@ public strictfp class RobotPlayer {
   @SuppressWarnings("unused")
   public static void run(RobotController rc) throws GameActionException {
     boolean reachedDest = false;
-    MapLocation dest = new MapLocation(24, 15);
+    MapLocation dest = new MapLocation(24, 20);
 
     // Hello world! Standard output is very useful for debugging.
     // Everything you say here will be directly viewable in your terminal when you run a match!
@@ -87,8 +87,11 @@ public strictfp class RobotPlayer {
           if (!reachedDest && !rc.getLocation().equals(dest)) {
             PathFind.bugNavOne(rc, dest);
             continue;
+          } else if (!reachedDest) {
+            System.out.println("INSIDE");
+            PathFind.resetBug();
+            reachedDest = true;
           }
-          reachedDest = true;
           Skirmish.basicOffense2(rc);
 //                  if (rc.canMove(Direction.WEST)) {
 //                    rc.move(Direction.WEST);
