@@ -2,6 +2,8 @@ package moveBot1;
 
 import battlecode.common.*;
 
+import java.util.HashSet;
+
 import static moveBot1.RobotPlayer.directions;
 
 public class PathFind {
@@ -13,6 +15,12 @@ public class PathFind {
 
   private static MapLocation enemyFlagLocation = null;
 
+  //NAV2 variables
+  private static MapLocation prevDest = null;
+  private static HashSet<MapLocation> line = null;
+  private static int obstacleStartDist = 0;
+
+
   public static void resetBug() {
     bugState = 0; //0 head to target, 1 circling
     closestObstacle = null;
@@ -20,14 +28,14 @@ public class PathFind {
     bugDir = null;
   }
 
-  public static void bugNavOne(RobotController rc, MapLocation dest) throws GameActionException {
+  public static void bugNavOne(RobotController rc, MapLocation dest, boolean isAllowedToFill) throws GameActionException {
 //    if (closestObstacle != null) {
 //      System.out.println(rc.getLocation().toString());
 //      System.out.println(dest.toString());
 ////      System.out.println(closestObstacle.toString());
 //
 //    }
-    rc.setIndicatorString("BugState: " + bugState + " closestObstacle: " + closestObstacle + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
+    rc.setIndicatorString("BugState: " + bugState + " bugDir: " + bugDir + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
     if (!rc.isMovementReady() || rc.getLocation().equals(dest)) {
       rc.setIndicatorString("I am at Destination or I cannot Move");
       resetBug();
@@ -38,7 +46,11 @@ public class PathFind {
 //    }
     if (bugState == 0) {
       bugDir = rc.getLocation().directionTo(dest);
-      System.out.println("bugDir: " + bugDir.toString());
+//      System.out.println("bugDir: " + bugDir.toString());
+      MapLocation fillLoc = rc.getLocation().add(bugDir);
+      if (canFill(rc, fillLoc, isAllowedToFill) && closestObstacle.equals(fillLoc)) {
+        resetBug();
+      }
       if (rc.canMove(bugDir)) {
         rc.move(bugDir);
         return;
@@ -55,6 +67,14 @@ public class PathFind {
     if (rc.getLocation().distanceSquaredTo(dest) < closestObstacleDist) {
       closestObstacleDist = rc.getLocation().distanceSquaredTo(dest);
       closestObstacle = rc.getLocation();
+    }
+    Direction[] fillableDir = new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+    for (Direction curr : fillableDir) {
+      MapLocation fillLoc = rc.getLocation().add(curr);
+      if (canFill(rc, fillLoc, isAllowedToFill) && closestObstacle.equals(fillLoc)) {
+        resetBug();
+      }
+
     }
 
     for (int i = 0; i < 9; i++) {
@@ -75,6 +95,54 @@ public class PathFind {
 //      }
 //      i++;
 //    } while (i < 8);
+  }
+
+  public static void bugNavTwo(RobotController rc, MapLocation dest) throws GameActionException {
+    rc.setIndicatorString("BugState: " + bugState + " closestObstacle: " + closestObstacle + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
+    if (!rc.isMovementReady() || rc.getLocation().equals(dest)) {
+      rc.setIndicatorString("I am at Destination or I cannot Move");
+      resetBug();
+      return;
+    }
+    if (!dest.equals(prevDest)) {
+      prevDest = dest;
+      line = Util.createLine(rc.getLocation(), dest);
+    }
+    for (MapLocation loc : line) {
+      rc.setIndicatorDot(loc, 255, 0, 0);
+    }
+    if (bugState == 0) {
+      bugDir = rc.getLocation().directionTo(dest);
+//      System.out.println("bugDir: " + bugDir.toString());
+      if (rc.canMove(bugDir)) {
+        rc.move(bugDir);
+        return;
+      }
+      bugState = 1;
+      obstacleStartDist = rc.getLocation().distanceSquaredTo(dest);
+      bugDir = rc.getLocation().directionTo(dest);
+      return;
+    }
+    //bugState =1
+
+    if (line.contains(rc.getLocation()) && rc.getLocation().distanceSquaredTo(dest) < obstacleStartDist) {
+      bugState = 0;
+    }
+
+    for (int i = 0; i < 9; i++) {
+      if (rc.canMove(bugDir)) {
+        rc.move(bugDir);
+        bugDir = bugDir.rotateRight();
+        bugDir = bugDir.rotateRight();
+        break;
+      } else {
+        bugDir = bugDir.rotateLeft();
+      }
+    }
+  }
+
+  public static void moveTowardsTarget(RobotController rc, MapLocation target, boolean isAllowedToFill) throws GameActionException {
+    bugNavOne(rc, target, isAllowedToFill);
   }
 
   public static void moveAwayFromTarget(RobotController rc, MapLocation target) throws GameActionException {
@@ -158,6 +226,13 @@ public class PathFind {
     }
   }
 
+  public static boolean canFill(RobotController rc, MapLocation target, boolean isAllowedToFill) throws GameActionException {
+    if (!isAllowedToFill || !rc.canFill(target)) {
+      return false;
+    }
+    rc.fill(target);
+    return true;
+  }
 //  public static void goToEnemyFlag(RobotController rc) throws GameActionException {
 //    if(enemyFlagLocation == null) {
 //      enemyFlagLocation = rc.senseBroadcastFlagLocations()

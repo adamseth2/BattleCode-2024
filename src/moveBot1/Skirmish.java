@@ -23,7 +23,7 @@ public class Skirmish {
       return;
     }
     //move close and try to attack
-    PathFind.bugNavOne(rc, enemyLocation);
+    PathFind.bugNavOne(rc, enemyLocation, true);
     if (rc.canAttack(enemyLocation)) {
       rc.attack(enemyLocation);
       rc.setIndicatorString(Integer.toString(++timesAttack));
@@ -56,7 +56,7 @@ public class Skirmish {
       return;
     }
     //move close and try to attack
-    PathFind.bugNavOne(rc, enemyLocation);
+    PathFind.bugNavOne(rc, enemyLocation, true);
 //    System.out.println("I moved and I can attack: " + Integer.toString(rc.getActionCooldownTurns()));
     if (rc.canAttack(enemyLocation)) {
       rc.attack(enemyLocation);
