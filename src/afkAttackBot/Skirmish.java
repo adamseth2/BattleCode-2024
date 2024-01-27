@@ -6,7 +6,7 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
 
 public class Skirmish {
-
+  static int timesAttack = 0;
 
   public static void attackAndMoveBack(RobotController rc) throws GameActionException {
 
@@ -20,6 +20,7 @@ public class Skirmish {
     MapLocation enemyLocation = nearbyEnemies[0].location;
     if (rc.canAttack(enemyLocation)) {
       rc.attack(enemyLocation);
+      rc.setIndicatorString(Integer.toString(++timesAttack));
     }
 
   }

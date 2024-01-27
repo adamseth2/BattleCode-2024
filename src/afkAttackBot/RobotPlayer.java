@@ -122,7 +122,8 @@ public strictfp class RobotPlayer {
       MapLocation[] spawnLocs = rc.getAllySpawnLocations();
       // Pick a random spawn location to attempt spawning in.
       MapLocation randomLoc = spawnLocs[0];
-      if (rc.canSpawn(randomLoc)) rc.spawn(randomLoc);
+      MapLocation setSpawnLocation = new MapLocation(27, 15);
+      if (rc.canSpawn(randomLoc)) rc.spawn(setSpawnLocation);
     }
   }
 

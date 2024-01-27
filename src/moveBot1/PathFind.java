@@ -2,8 +2,6 @@ package moveBot1;
 
 import battlecode.common.*;
 
-import java.util.Arrays;
-
 import static moveBot1.RobotPlayer.directions;
 
 public class PathFind {
@@ -73,6 +71,30 @@ public class PathFind {
 
   public static void moveAwayFromTarget(RobotController rc, MapLocation target) throws GameActionException {
     if (!rc.isMovementReady()) {
+      return;
+    }
+    Direction oppositeDirection = rc.getLocation().directionTo(target).opposite();
+    if (rc.canMove(oppositeDirection)) {
+      rc.move(oppositeDirection);
+      return;
+    }
+    //if cannot move in exact opposite, will go away in an angle
+    if (rc.canMove(oppositeDirection.rotateLeft())) {
+      rc.move(oppositeDirection.rotateLeft());
+      return;
+    }
+    if (rc.canMove(oppositeDirection.rotateRight())) {
+      rc.move(oppositeDirection.rotateRight());
+      return;
+    }
+  }
+
+  public static void moveAwayFromTargetAttackRange(RobotController rc, MapLocation target) throws GameActionException {
+    if (!rc.isMovementReady()) {
+      return;
+    }
+    // not in attack range
+    if (!Util.isInAttackRange(rc.getLocation(), target)) {
       return;
     }
     Direction oppositeDirection = rc.getLocation().directionTo(target).opposite();
