@@ -27,7 +27,7 @@ public strictfp class RobotPlayer {
    * import at the top of this file. Here, we *seed* the RNG with a constant number (6147); this makes sure
    * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
    */
-  static final Random rng = new Random(6147);
+  static Random rng = new Random(6147);
 
   /**
    * Array containing all the possible movement directions.
@@ -54,7 +54,9 @@ public strictfp class RobotPlayer {
   public static void run(RobotController rc) throws GameActionException {
     boolean reachedDest = false;
     MapLocation dest = new MapLocation(4, 8);
-
+    if (rng == null) {
+      rng = new Random(rc.getID());
+    }
     // Hello world! Standard output is very useful for debugging.
     // Everything you say here will be directly viewable in your terminal when you run a match!
 
@@ -84,15 +86,18 @@ public strictfp class RobotPlayer {
 //                      nearestCrumb = crumbArr[0];
 //                    }
 //          rc.setIndicatorString(Boolean.toString(reachedDest));
-          if (!reachedDest && !rc.getLocation().equals(dest)) {
-            PathFind.bugNavOne(rc, dest, true);
-            continue;
-          } else if (!reachedDest) {
-            System.out.println("INSIDE");
-            PathFind.resetBug();
-            reachedDest = true;
-          }
-          Skirmish.basicOffense2(rc);
+          Setup.runSetUp(rc);
+//          if (!reachedDest && !rc.getLocation().equals(dest)) {
+//            PathFind.bugNavOne(rc, dest, true);
+//            continue;
+//          } else if (!reachedDest) {
+//            System.out.println("INSIDE");
+//            PathFind.resetBug();
+//            reachedDest = true;
+//          }
+//          Skirmish.basicOffense2(rc);
+
+
 //                  if (rc.canMove(Direction.WEST)) {
 //                    rc.move(Direction.WEST);
 //                  } else {

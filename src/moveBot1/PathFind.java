@@ -20,12 +20,20 @@ public class PathFind {
   private static HashSet<MapLocation> line = null;
   private static int obstacleStartDist = 0;
 
+  //explore variables
+  private static Direction exploreDirection = null;
 
   public static void resetBug() {
     bugState = 0; //0 head to target, 1 circling
     closestObstacle = null;
     closestObstacleDist = Integer.MAX_VALUE;
     bugDir = null;
+  }
+
+  public static void resetBugIfReachedDest(RobotController rc, MapLocation dest) throws GameActionException {
+    if (rc.getLocation().equals(dest)) {
+      resetBug();
+    }
   }
 
   public static void bugNavOne(RobotController rc, MapLocation dest, boolean isAllowedToFill) throws GameActionException {
@@ -35,24 +43,28 @@ public class PathFind {
 ////      System.out.println(closestObstacle.toString());
 //
 //    }
+
+//    if (dest.equals(new MapLocation(27, 29))) {
+//      System.out.println("BugState: " + bugState + " bugDir: " + bugDir + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
+//      System.out.println("closestObstalce: " + closestObstacle);
+//    }
     rc.setIndicatorString("BugState: " + bugState + " bugDir: " + bugDir + "isAtLocation: " + Boolean.toString(rc.getLocation().equals(dest)) + " dest = " + dest.toString());
     if (!rc.isMovementReady() || rc.getLocation().equals(dest)) {
       rc.setIndicatorString("I am at Destination or I cannot Move");
-      resetBug();
       return;
     }
 //    if(rc.sensePassability(dest)) {
 //      rc.setIndicatorString("Path is not passable");
 //    }
+
+
     if (bugState == 0) {
       bugDir = rc.getLocation().directionTo(dest);
 //      System.out.println("bugDir: " + bugDir.toString());
       MapLocation fillLoc = rc.getLocation().add(bugDir);
-      if (canFill(rc, fillLoc, isAllowedToFill) && closestObstacle.equals(fillLoc)) {
-        resetBug();
-      }
       if (rc.canMove(bugDir)) {
         rc.move(bugDir);
+        resetBugIfReachedDest(rc, dest);
         return;
       }
       bugState = 1;
@@ -80,6 +92,7 @@ public class PathFind {
     for (int i = 0; i < 9; i++) {
       if (rc.canMove(bugDir)) {
         rc.move(bugDir);
+        resetBugIfReachedDest(rc, dest);
         bugDir = bugDir.rotateRight();
         bugDir = bugDir.rotateRight();
         break;
@@ -142,6 +155,10 @@ public class PathFind {
   }
 
   public static void moveTowardsTarget(RobotController rc, MapLocation target, boolean isAllowedToFill) throws GameActionException {
+    if (rc.getLocation().equals(target)) {
+      System.out.println("RESET BUG IN TARGET");
+      resetBug();
+    }
     bugNavOne(rc, target, isAllowedToFill);
   }
 
@@ -219,10 +236,14 @@ public class PathFind {
     if (!rc.isMovementReady()) {
       return;
     }
-    Direction dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-//    MapLocation nextLoc = rc.getLocation().add(dir);
-    if (rc.canMove(dir)) {
-      rc.move(dir);
+    //TODO if can fill fill
+    if (exploreDirection != null && rc.canMove(exploreDirection)) {
+      rc.move(exploreDirection);
+    } else {
+      exploreDirection = directions[RobotPlayer.rng.nextInt(directions.length)];
+      if (rc.canMove(exploreDirection)) {
+        rc.move(exploreDirection);
+      }
     }
   }
 
@@ -247,4 +268,24 @@ public class PathFind {
 //    }
 //  }
 
+  // maybe useful idk
+//  public static void exploreRandomly(RobotController rc) throws GameActionException {
+//    if (!rc.isMovementReady()) {
+//      return;
+//    }
+//    if(exploreDirection == null)
+//      Direction dir = directions[RobotPlayer.rng.nextInt(directions.length)];
+////    MapLocation nextLoc = rc.getLocation().add(dir);
+//    //does 3 times
+//    if (!rc.canMove(dir)) {
+//      dir = directions[RobotPlayer.rng.nextInt(directions.length)];
+//      if (!rc.canMove(dir)) {
+//        dir = directions[RobotPlayer.rng.nextInt(directions.length)];
+//        if (!rc.canMove(dir)) {
+//          return;
+//        }
+//      }
+//    }
+//    rc.move(dir);
+//  }
 }

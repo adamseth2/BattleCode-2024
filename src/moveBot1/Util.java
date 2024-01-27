@@ -3,6 +3,7 @@ package moveBot1;
 import battlecode.common.GameActionException;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 import java.util.HashSet;
 
@@ -13,6 +14,23 @@ public class Util {
 
   public static boolean isSamePlane(MapLocation loc1, MapLocation loc2) throws GameActionException {
     return loc1.x == loc2.x || loc1.y == loc2.y;
+  }
+
+  //shortest distance
+  public static MapLocation closestLocation(RobotController rc, MapLocation origin, MapLocation[] locArr) {
+    if (locArr == null || locArr.length == 0) {
+      return null;
+    }
+    int closestLocDistance = locArr[0].distanceSquaredTo(origin);
+    MapLocation closestLoc = locArr[0];
+    for (int i = 1; i < locArr.length; i++) {
+      int currDistance = locArr[i].distanceSquaredTo(origin);
+      if (currDistance < closestLocDistance) {
+        closestLoc = locArr[i];
+        closestLocDistance = currDistance;
+      }
+    }
+    return closestLoc;
   }
 
   public static HashSet<MapLocation> createLine(MapLocation a, MapLocation b) {
