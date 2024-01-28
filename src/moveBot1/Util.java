@@ -70,4 +70,20 @@ public class Util {
     locs.add(new MapLocation(x, y));
     return locs;
   }
+
+  public static <T> void addToNextEmptyIndex(T[] arr, T newData) {
+    if (arr == null || arr.length == 0) {
+      System.out.println("ERROR addToNextEmptyIndex inputted was empty");
+      return;
+    }
+    for (int i = 0; i < arr.length; i++) {
+      if (arr[i] == null) {
+        arr[i] = newData;
+        return;
+      }
+    }
+    System.out.println("ERROR addToNextEmptyIndex inputted was FULL");
+
+  }
 }
+

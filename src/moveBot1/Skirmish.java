@@ -12,6 +12,9 @@ public class Skirmish {
 
   public static void basicOffense(RobotController rc) throws GameActionException {
     RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+    if (nearbyEnemies.length == 0) {
+      return;
+    }
     MapLocation enemyLocation = nearbyEnemies[0].location;
     if (rc.canAttack(enemyLocation)) {
       rc.attack(enemyLocation);

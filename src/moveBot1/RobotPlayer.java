@@ -1,10 +1,7 @@
 package moveBot1;
 
-import moveBot1.Skirmish;
 import battlecode.common.*;
 
-import java.awt.*;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -27,7 +24,11 @@ public strictfp class RobotPlayer {
    * import at the top of this file. Here, we *seed* the RNG with a constant number (6147); this makes sure
    * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
    */
-  static Random rng = new Random(6147);
+  static Random rng = null;
+  public static int personalID = -1;
+  public static int guardianID = -1;
+  public static RunnableBot bot;
+  public static MapLocation[] centers = new MapLocation[3];
 
   /**
    * Array containing all the possible movement directions.
@@ -57,9 +58,24 @@ public strictfp class RobotPlayer {
     if (rng == null) {
       rng = new Random(rc.getID());
     }
+    bot = Role.getRobotRole(rc.getID());
+    if (personalID == -1 && rc.canWriteSharedArray(0, 0)) {
+      personalID = rc.readSharedArray(63);
+      rc.writeSharedArray(63, personalID + 1);
+
+      // Assign first three builders to be in the guardian role
+      int guardianCount = rc.readSharedArray(62);
+      if (bot == Role.BUILDER && guardianCount < 3) {
+        bot = Role.GUARDIAN;
+        guardianID = guardianCount;
+        rc.writeSharedArray(62, guardianCount + 1);
+      }
+    }
+    rc.setIndicatorString("Role is " + bot);
+    getSpawnCenters(rc);
+
     // Hello world! Standard output is very useful for debugging.
     // Everything you say here will be directly viewable in your terminal when you run a match!
-
     // You can also use indicators to save debug notes in replays.
 
     while (true) {
@@ -73,20 +89,33 @@ public strictfp class RobotPlayer {
       try {
         // Make sure you spawn your robot in before you attempt to take any actions!
         // Robots not spawned in do not have vision of any tiles and cannot perform any actions.
-        if (rc.readSharedArray(0) == 0) {
-          rc.writeSharedArray(0, rc.getID());
-        }
-        if (rc.readSharedArray(0) == rc.getID()) {
-          trySpawn(rc);
-        }
-        if (rc.isSpawned()) {
+//        if (rc.readSharedArray(0) == 0) {
+//          rc.writeSharedArray(0, rc.getID());
+//        }
+//        if (rc.readSharedArray(0) == rc.getID()) {
+//        }
+        trySpawn(rc);
+
 //                    MapLocation[] crumbArr = rc.senseNearbyCrumbs(-1);
 //                    MapLocation nearestCrumb = null;
 //                    if(crumbArr.length != 0) {
 //                      nearestCrumb = crumbArr[0];
 //                    }
 //          rc.setIndicatorString(Boolean.toString(reachedDest));
-          Setup.runSetUp(rc);
+        boolean isInSetUpPhrase = rc.getRoundNum() < GameConstants.SETUP_ROUNDS;
+        if (isInSetUpPhrase) {
+          bot.runSetUp(rc);
+        } else {
+          bot.runMainPhrase(rc);
+        }
+        if (rc.isSpawned()) {
+          if (bot.role == Role.BUILDER) {
+            rc.setIndicatorDot(rc.getLocation(), 0, 0, 255);
+          } else if (bot.role == Role.GUARDIAN) {
+            rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
+          } else if (bot.role == Role.HEALER) {
+            rc.setIndicatorDot(rc.getLocation(), 255, 255, 0);
+          }
 //          if (!reachedDest && !rc.getLocation().equals(dest)) {
 //            PathFind.bugNavOne(rc, dest, true);
 //            continue;
@@ -130,14 +159,46 @@ public strictfp class RobotPlayer {
     // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
   }
 
-
   public static void trySpawn(RobotController rc) throws GameActionException {
-    if (!rc.isSpawned()) {
-      MapLocation[] spawnLocs = rc.getAllySpawnLocations();
-      // Pick a random spawn location to attempt spawning in.
-      MapLocation randomLoc = spawnLocs[0];
-      if (rc.canSpawn(randomLoc)) rc.spawn(randomLoc);
+    if (rc.isSpawned()) {
+      return;
     }
+
+    // Pick a random spawn location to attempt spawning in.
+    //tries 3 times
+    MapLocation[] spawnLocs = rc.getAllySpawnLocations();
+    MapLocation randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+  }
+
+  public static void getSpawnCenters(RobotController rc) throws GameActionException {
+    MapLocation[] spawnLocs = rc.getAllySpawnLocations();
+    for (int i = 0; i < spawnLocs.length; i++) {
+      int adjCount = 0;
+      for (int j = 0; j < spawnLocs.length; j++) {
+        if (spawnLocs[j].isAdjacentTo(spawnLocs[i])) {
+          adjCount++;
+        }
+      }
+      if (adjCount == 9) {
+        Util.addToNextEmptyIndex(centers, spawnLocs[i]);
+      }
+    }
+
+//    }
   }
 
   public static void updateEnemyRobots(RobotController rc) throws GameActionException {

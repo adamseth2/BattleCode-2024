@@ -1,7 +1,6 @@
 package afkAttackBot;
 
 import battlecode.common.*;
-import afkAttackBot.Skirmish;
 
 import java.util.Random;
 
