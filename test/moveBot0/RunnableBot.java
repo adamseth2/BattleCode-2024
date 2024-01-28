@@ -1,18 +1,16 @@
-package moveBot1;
+package moveBot0;
 
 import battlecode.common.*;
 
 import java.util.Arrays;
-
-import static moveBot1.RobotPlayer.rng;
 
 public abstract class RunnableBot {
   public Role role;
 
   //go to map stuff
   private static MapLocation flagTarget = null;
+
   //crumb stuff
-  private static MapLocation[] spawnLocation = null;
   private static MapLocation[] crumbLocationArr = null;
   private static MapLocation targetCrumb = null;
   private static int turnsTryToGoToCrumb = 0;
@@ -27,11 +25,11 @@ public abstract class RunnableBot {
     if (turnsTryToGoToCrumb >= 50 || rc.getLocation().equals(targetCrumb)) {
       resetCrumbVars();
     }
-//    System.out.println(Arrays.toString(crumbLocationArr));
+    System.out.println(Arrays.toString(crumbLocationArr));
     if (crumbLocationArr == null || crumbLocationArr.length == 0) {
       crumbLocationArr = rc.senseNearbyCrumbs(-1);
       rc.setIndicatorString("There is no Crumbs in my vision");
-      PathFind.exploreRandomDirection(rc);
+      PathFind.exploreRandomly(rc);
       return;
     }
     if (targetCrumb == null) {
@@ -60,14 +58,7 @@ public abstract class RunnableBot {
       return;
     }
     //moves towards flag
-    MapLocation[] flagLocation2 = rc.senseBroadcastFlagLocations();
-    MapLocation[] flagLocation = new MapLocation[flagLocation2.length + 1];
-    int z = 0;
-    for (MapLocation curr : flagLocation2) {
-      flagLocation[z] = curr;
-      z++;
-    }
-    flagLocation[flagLocation2.length] = Communication.intToLocation(rc, rc.readSharedArray(0));
+    MapLocation[] flagLocation = rc.senseBroadcastFlagLocations();
     boolean isAllFlagsTaken = flagLocation.length == 0;
     if (isAllFlagsTaken) {
       return;
@@ -79,12 +70,7 @@ public abstract class RunnableBot {
 
   //have flag to back to spawn
   public static void goToBase(RobotController rc) throws GameActionException {
-    if (spawnLocation == null) {
-      spawnLocation = rc.getAllySpawnLocations();
-    }
-    if (rc.hasFlag()) {
-      rc.writeSharedArray(0, Communication.locationToInt(rc, rc.getLocation()));
-    }
+    MapLocation[] spawnLocation = rc.getAllySpawnLocations();
     MapLocation closestSpawn = Util.closestLocation(rc, rc.getLocation(), spawnLocation);
     if (closestSpawn == null) {
       System.out.println("ERROR for some reason spawnlocation is null");
@@ -106,31 +92,6 @@ public abstract class RunnableBot {
       if (rc.canHeal(currFriend.getLocation())) {
         rc.heal(currFriend.getLocation());
       }
-    }
-  }
-
-  public void trySpawn(RobotController rc) throws GameActionException {
-    if (rc.isSpawned()) {
-      return;
-    }
-
-    // Pick a random spawn location to attempt spawning in.
-    //tries 3 times
-    MapLocation[] spawnLocs = rc.getAllySpawnLocations();
-    MapLocation randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
-    if (rc.canSpawn(randomLoc)) {
-      rc.spawn(randomLoc);
-      return;
-    }
-    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
-    if (rc.canSpawn(randomLoc)) {
-      rc.spawn(randomLoc);
-      return;
-    }
-    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
-    if (rc.canSpawn(randomLoc)) {
-      rc.spawn(randomLoc);
-      return;
     }
   }
 }

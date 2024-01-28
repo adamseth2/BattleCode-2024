@@ -1,6 +1,8 @@
-package moveBot1;
+package moveBot0;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 public class Guardian extends RunnableBot {
 
@@ -18,22 +20,6 @@ public class Guardian extends RunnableBot {
 
   public void runMainPhrase(RobotController rc) throws GameActionException {
     runSetUp(rc);
-  }
-
-  @Override
-  public void trySpawn(RobotController rc) throws GameActionException {
-    if (rc.isSpawned()) {
-      return;
-    }
-    MapLocation centerSpawn = RobotPlayer.centers[RobotPlayer.guardianID];
-    if (rc.canSpawn(centerSpawn)) {
-      rc.spawn(centerSpawn);
-    }
-    for (Direction currDir : Direction.allDirections()) {
-      if (rc.canSpawn(centerSpawn.add(currDir))) {
-        rc.spawn(centerSpawn.add(currDir));
-      }
-    }
   }
 //    public static void runGuardian(RobotController rc) throws GameActionException {
 

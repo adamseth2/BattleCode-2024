@@ -1,11 +1,14 @@
-package moveBot1;
+package moveBot0;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static moveBot1.RobotPlayer.directions;
+import static moveBot0.RobotPlayer.directions;
 
 public class PathFind {
 
@@ -288,7 +291,7 @@ public class PathFind {
   }
 
   //Not very helpful as doesn't really go anywhere
-  public static void exploreRandomDirection(RobotController rc) throws GameActionException {
+  public static void exploreRandomly(RobotController rc) throws GameActionException {
     if (!rc.isMovementReady()) {
       return;
     }
@@ -301,24 +304,6 @@ public class PathFind {
         rc.move(exploreDirection);
       }
     }
-  }
-
-  public static void exploreRandom(RobotController rc) throws GameActionException {
-    if (!rc.isMovementReady()) {
-      return;
-    }
-    Direction dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-    //does 3 times until finds a path it can go
-    if (!rc.canMove(dir)) {
-      dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-      if (!rc.canMove(dir)) {
-        dir = directions[RobotPlayer.rng.nextInt(directions.length)];
-        if (!rc.canMove(dir)) {
-          return;
-        }
-      }
-    }
-    rc.move(dir);
   }
 
   public static boolean canFill(RobotController rc, MapLocation target, boolean isAllowedToFill) throws GameActionException {

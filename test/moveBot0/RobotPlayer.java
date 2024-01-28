@@ -1,4 +1,4 @@
-package moveBot1;
+package moveBot0;
 
 import battlecode.common.*;
 
@@ -67,7 +67,6 @@ public strictfp class RobotPlayer {
       int guardianCount = rc.readSharedArray(62);
       if (bot.role == Role.BUILDER && guardianCount < 3) {
         bot = new Guardian();
-        bot.init();
         guardianID = guardianCount;
         rc.writeSharedArray(62, guardianCount + 1);
       }
@@ -95,7 +94,7 @@ public strictfp class RobotPlayer {
 //        }
 //        if (rc.readSharedArray(0) == rc.getID()) {
 //        }
-        bot.trySpawn(rc);
+        trySpawn(rc);
 
 //                    MapLocation[] crumbArr = rc.senseNearbyCrumbs(-1);
 //                    MapLocation nearestCrumb = null;
@@ -107,13 +106,6 @@ public strictfp class RobotPlayer {
         if (isInSetUpPhrase) {
           bot.runSetUp(rc);
         } else {
-          if (rc.canBuyGlobal(GlobalUpgrade.ACTION)) {
-            rc.buyGlobal(GlobalUpgrade.ACTION);
-          } else if (rc.canBuyGlobal(GlobalUpgrade.HEALING)) {
-            rc.buyGlobal(GlobalUpgrade.HEALING);
-          } else if (rc.canBuyGlobal(GlobalUpgrade.CAPTURING)) {
-            rc.buyGlobal(GlobalUpgrade.CAPTURING);
-          }
           bot.runMainPhrase(rc);
         }
         if (rc.isSpawned()) {
@@ -167,6 +159,30 @@ public strictfp class RobotPlayer {
     // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
   }
 
+  public static void trySpawn(RobotController rc) throws GameActionException {
+    if (rc.isSpawned()) {
+      return;
+    }
+
+    // Pick a random spawn location to attempt spawning in.
+    //tries 3 times
+    MapLocation[] spawnLocs = rc.getAllySpawnLocations();
+    MapLocation randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+    randomLoc = spawnLocs[rng.nextInt(spawnLocs.length - 1)];
+    if (rc.canSpawn(randomLoc)) {
+      rc.spawn(randomLoc);
+      return;
+    }
+  }
 
   public static void getSpawnCenters(RobotController rc) throws GameActionException {
     MapLocation[] spawnLocs = rc.getAllySpawnLocations();

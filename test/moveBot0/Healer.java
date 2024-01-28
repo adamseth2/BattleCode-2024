@@ -1,6 +1,7 @@
-package moveBot1;
+package moveBot0;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
 
 public class Healer extends RunnableBot {
 
@@ -20,7 +21,7 @@ public class Healer extends RunnableBot {
     //TODO MOVE AWAY
     Skirmish.basicOffense(rc);
     goToEnemyFlag(rc);
-    PathFind.exploreRandomDirection(rc);
+    PathFind.exploreRandomly(rc);
   }
 
 }

@@ -1,6 +1,9 @@
-package moveBot1;
+package moveBot0;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
 
 public class Skirmish {
 
@@ -11,9 +14,6 @@ public class Skirmish {
   }
 
   public static void basicOffense(RobotController rc) throws GameActionException {
-    if (!rc.isActionReady()) {
-      return;
-    }
     RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
     if (nearbyEnemies == null || nearbyEnemies.length == 0) {
       return;
@@ -39,7 +39,7 @@ public class Skirmish {
     rc.setIndicatorString(Integer.toString(rc.getActionCooldownTurns()));
     if (nearbyEnemies.length == 0) {
       rc.setIndicatorString("Exploring Randomly");
-      PathFind.exploreRandomDirection(rc);
+      PathFind.exploreRandomly(rc);
       return;
     }
     MapLocation enemyLocation = nearbyEnemies[0].location;

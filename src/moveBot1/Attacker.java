@@ -4,7 +4,6 @@ import battlecode.common.*;
 
 public class Attacker extends RunnableBot {
 
-
   public void init() {
     this.role = Role.ATTACKER;
   }
@@ -14,13 +13,13 @@ public class Attacker extends RunnableBot {
   }
 
   public void runMainPhrase(RobotController rc) throws GameActionException {
-    MapLocation homeLoc = RobotPlayer.centers[RobotPlayer.guardianID];
-    rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
-    if (!rc.getLocation().equals(homeLoc)) {
-      PathFind.moveTowardsTarget(rc, homeLoc, true, "bugNavOne");
+    if (rc.hasFlag()) {
+      goToBase(rc);
     }
-//  public static void runAttacker(RobotController rc) throws GameActionException {
-//    }
+    Skirmish.basicOffense(rc);
+    heal(rc);
+    goToEnemyFlag(rc);
+    PathFind.exploreRandomDirection(rc);
   }
-
 }
+

@@ -9,12 +9,14 @@ public enum Role {
   GUARDIAN;
 
   public static RunnableBot getRobotRole(int id) {
-    RunnableBot role = new Attacker();
+    RunnableBot bot = new Attacker();
     if (id % 7 == 0) {
-      role = new Builder();
+      bot = new Builder();
     } else if (id % 3 == 0) {
-      role = new Healer();
+      bot = new Healer();
     }
-    return role;
+    bot.init();
+    System.out.println("My role is: " + bot.role);
+    return bot;
   }
 }
